@@ -1,0 +1,24 @@
+#!/bin/sh
+
+./gradlew jar || exit 1
+
+# Upload the current built JAR file to Suffield Academy's site repository
+
+# Version defined by upstream
+UPSTREAM=2.7.0-SNAPSHOT
+
+# Our local version
+LOCAL=${UPSTREAM%-SNAPSHOT}-SA-$(date +%Y%m%d)
+
+mvn install:install-file \
+   -Dfile=build/libs/ev3dev-lang-java-${UPSTREAM}.jar \
+   -DgroupId=com.github.ev3dev-lang-java \
+   -DartifactId=ev3dev-lang-java \
+   -Dversion=${LOCAL} \
+   -Dpackaging=jar \
+   -DcreateChecksum=true \
+   -DgeneratePom=true
+
+rsync -av ~/.m2/repository/com/github/ev3dev-lang-java/ev3dev-lang-java/ \
+files.suffieldacademy.org:/mnt/tank0/stage/www/web/cs/mvnrepo/com/github/ev3dev-lang-java/ev3dev-lang-java/
+
